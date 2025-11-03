@@ -65,72 +65,48 @@ const images = [
   },
 ];
 
-// ==============================================================
-// Використанням DocumentFragment
-
-// 3 - Розмітка елементів галереї
-
-const ulElem = document.querySelector(".gallery");
-
-const fragment = document.createDocumentFragment();
-
-for (const image of images) {
-  const liElem = document.createElement("li");
-  liElem.classList.add("gallery-item");
-
-  const linkElem = document.createElement("a");
-  linkElem.classList.add("gallery-link");
-  linkElem.setAttribute("href", image.original);
-
-  const imgElem = document.createElement("img");
-  imgElem.classList.add("gallery-image");
-  imgElem.setAttribute("src", image.preview);
-  imgElem.dataset.source = image.original;
-  imgElem.setAttribute("alt", image.description);
-  imgElem.addEventListener("click", function (event) {});
-
-  linkElem.append(imgElem);
-  liElem.append(linkElem);
-  fragment.append(liElem);
+function imageTemplate(image) {
+  return `<li class="gallery-item">
+      <a class="gallery-link" href="${image.original}">
+        <img
+          class="gallery-image"
+          src="${image.preview}"
+          data-source="${image.original}"
+          alt="${image.description}"
+        />
+      </a>
+    </li>`;
 }
 
-ulElem.append(fragment);
+function imagesTemplate(images) {
+  return images.map(imageTemplate).join("");
+}
 
-// 5 - Делегування
+const galleryListElem = document.querySelector(".gallery");
 
-ulElem.addEventListener("click", (event) => {
-  event.preventDefault();
-
-  const clickedImg = event.target;
-
-  if (clickedImg.nodeName !== "IMG") {
+galleryListElem.addEventListener("click", (e) => {
+  e.preventDefault();
+  if (e.target.tagName !== "IMG") {
     return;
   }
 
-  const source = clickedImg.dataset.source;
-
-  openModal(source);
-});
-
-// 7 - Модальне вікно
-
-function openModal(source) {
   const instance = basicLightbox.create(`
-    <div class="modal">
-      <img src="${source}"/>
-    </div>
-  `);
-
-  // 8 - Велике зображення
+<div class="modal">
+    <img src="${e.target.dataset.source}" width="800" height="600">
+</div>
+`);
 
   instance.show();
-}
+});
 
-// ===============================================================
-// Використання шаблонного рядка для розмітки
+const galleryMarkup = imagesTemplate(images);
+
+galleryListElem.insertAdjacentHTML("beforeend", galleryMarkup);
+
+// =====================================================================
 
 // 3 - Розмітка елементів галереї
-// const ulElem = document.querySelector(".gallery");
+// const galleryListElem = document.querySelector(".gallery");
 
 // const galleryMarkup = images
 //   .map(
@@ -150,10 +126,10 @@ function openModal(source) {
 //   .join("");
 
 // // Додаємо розмітку в DOM
-// ulElem.innerHTML = galleryMarkup;
+// galleryListElem.innerHTML = galleryMarkup;
 
 // // 5 - Делегування
-// ulElem.addEventListener("click", (event) => {
+// galleryListElem.addEventListener("click", (event) => {
 //   event.preventDefault();
 
 //   // Перевіряємо, чи клікнули по зображенню
